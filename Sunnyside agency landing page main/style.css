@@ -96,7 +96,7 @@ body {
 }
 
 header {
-    background: url(../images/desktop/image-header.jpg);
+    background: url(./images/desktop/image-header.jpg);
     background-size: cover;
     background-position: bottom;
     background-repeat: no-repeat;
@@ -201,7 +201,7 @@ article .text p {
 }
 
 article .img {
-    background-image: url(../images/desktop/image-transform.jpg);
+    background-image: url(./images/desktop/image-transform.jpg);
     flex-basis: 50%;
     background-repeat: no-repeat;
     background-size: cover;
@@ -245,7 +245,7 @@ article:nth-child(2) .text {
 }
 
 article:nth-child(2) .img {
-    background-image: url(../images/desktop/image-stand-out.jpg);
+    background-image: url(./images/desktop/image-stand-out.jpg);
 }
 
 article:nth-child(2) .link::after {
@@ -263,14 +263,14 @@ article:nth-child(3) .right {
 }
 
 article:nth-child(3) .left {
-    background: url(../images/desktop/image-graphic-design.jpg);
+    background: url(./images/desktop/image-graphic-design.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position-x: 50%;
 }
 
 article:nth-child(3) .right {
-    background: url(../images/desktop/image-photography.jpg);
+    background: url(./images/desktop/image-photography.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position-x: 50%;
@@ -422,7 +422,7 @@ footer a:hover {
 
 @media (max-width:800px) {
     header {
-        background: url(../images/mobile/image-header.jpg);
+        background: url(./images/mobile/image-header.jpg);
         height: 100vh;
         background-size: cover;
         background-position: bottom;
@@ -441,7 +441,7 @@ footer a:hover {
     }
 
     article .img {
-        background: url(../images/mobile/image-transform.jpg);
+        background: url(./images/mobile/image-transform.jpg);
         background-size: cover;
         background-position: bottom;
         background-repeat: no-repeat;
@@ -449,7 +449,7 @@ footer a:hover {
     }
 
     article:nth-child(2) .img {
-        background: url(../images/mobile/image-stand-out.jpg);
+        background: url(./images/mobile/image-stand-out.jpg);
         background-size: cover;
         background-position: bottom;
         background-repeat: no-repeat;
