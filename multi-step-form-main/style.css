@@ -79,7 +79,7 @@ nav ul li {
     padding: .4em;
     width: 2.1em;
 
-    border: 1px solid var(--White);
+    border: 1px solid #fff;
     border-radius: 50%;
     box-sizing: border-box;
 
@@ -107,8 +107,8 @@ div[step] {
 /* step-1 */
 
 inputname {
-    font-size: 11px;
-    color: var(--Pastel-blue);
+    font-size: small;
+    color: var(--Marine-blue);
     font-weight: bold;
 }
 
@@ -397,11 +397,11 @@ div.button button[back] {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -55%);
+        transform: translate(-50%, -50%);
         padding: .51em;
         background-color: var(--White);
-        width: 55em;
-        height: 35em;
+        width: 56em;
+        height: 36em;
         display: flex;
         place-content: center;
         justify-content: flex-start;
@@ -446,7 +446,7 @@ div.button button[back] {
     }
 
     nav ul li {
-        width: 2em;
+        width: 2.3em;
         padding: 0.4em;
         margin-right: 1em;
     }
