@@ -397,7 +397,7 @@ div.button button[back] {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -55%);
         padding: .51em;
         background-color: var(--White);
         width: 55em;
