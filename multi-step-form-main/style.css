@@ -44,12 +44,14 @@ body {
 }
 
 h1 {
-    font-size: x-large;
+    color: var(--Marine-blue);
+    font-size: xx-large;
     font-family: ubnntu-bold;
 }
 
 p {
     color: var(--Cool-gray);
+    margin-bottom: 3em;
 }
 
 a {
@@ -115,7 +117,7 @@ input {
     font-weight: bold;
     color: var(--Cool-gray);
 
-    margin-block: .2em 1em;
+    margin-block: 0.5em 1.2em;
     padding: .7em .5em;
 
     border: var(--Light-gray) solid 1px;
@@ -398,8 +400,8 @@ div.button button[back] {
         transform: translate(-50%, -50%);
         padding: .51em;
         background-color: var(--White);
-        width: 50em;
-        height: 30em;
+        width: 55em;
+        height: 35em;
         display: flex;
         place-content: center;
         justify-content: flex-start;
@@ -407,8 +409,10 @@ div.button button[back] {
     }
 
     nav {
-        min-width: 13em;
-        min-height: 27em;
+        padding: 0.45em;
+        margin: 0.4em;
+        min-width: 16em;
+        min-height: 31em;
         background: url(./assets/images/bg-sidebar-desktop.svg);
         background-repeat: no-repeat;
         background-size: cover;
@@ -438,6 +442,7 @@ div.button button[back] {
         display: flex;
         flex-direction: column;
         align-items: start;
+        line-height: 1.5em;
     }
 
     nav ul li {
@@ -451,7 +456,7 @@ div.button button[back] {
         color: var(--Light-gray);
     }
 
-    main{
+    main {
         width: 100%;
         overflow-y: scroll;
     }
@@ -462,19 +467,22 @@ div.button button[back] {
         justify-content: space-between;
         align-items: flex-end;
     }
+
     div.button button {
-    position: relative;
+        position: relative;
     }
+
     div.button button[next] {
         margin-inline: auto 0;
     }
+
     div[step] {
         background-color: var(--White);
         margin: 0;
         margin-bottom: 6em;
     }
 
-    .total .SEprice{
+    .total .SEprice {
         font-size: larger;
         color: var(--Purplish-blue);
     }
