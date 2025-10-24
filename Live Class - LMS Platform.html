@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Class - LMS Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e4e9;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #5f6368;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .video-section {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* CRITICAL: Hide YouTube pause overlay with "More videos" */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: -80px;
+            /* Increased to hide title bar better */
+            left: 0;
+            width: 100%;
+            height: calc(100% + 160px);
+            /* Increased to crop more */
+            border: none;
+            pointer-events: none;
+            /* Changed from 'none' to allow playback */
+        }
+
+        /* Overlay to hide "More videos" section */
+        .video-blocker {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            /* Covers the bottom area where "More videos" appears */
+            background: transparent;
+            z-index: 20;
+            pointer-events: none;
+            /* Allow clicks through to custom controls */
+        }
+
+        /* Alternative: Complete overlay that shows only when paused */
+        .pause-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 15;
+        }
+
+        /* Custom Video Controls - increased z-index */
+        .custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 20px 15px 15px;
+            z-index: 100;
+            /* Increased to be above blocker */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .custom-controls {
+            opacity: 1;
+        }
+
+        /* .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 120px);
+            border: none;
+            pointer-events: none;
+        }
+
+        /* Overlay to block all YouTube UI */
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .live-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ff0000;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* Custom Video Controls */
+        .custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 20px 15px 15px;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .custom-controls {
+            opacity: 1;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.play-pause {
+            width: 60px;
+            height: 60px;
+            background: #1e88e5;
+        }
+
+        .control-btn.play-pause:hover {
+            background: #1565c0;
+        }
+
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #1a1a1a;
+        }
+
+        .control-btn.play-pause svg {
+            fill: #fff;
+        }
+
+        .skip-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #5f6368;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .viewer-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .instructor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 0;
+            border-top: 1px solid #e0e4e9;
+            border-bottom: 1px solid #e0e4e9;
+        }
+
+        .instructor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .instructor-details h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+            color: #1a1a1a;
+        }
+
+        .instructor-details p {
+            color: #5f6368;
+            font-size: 13px;
+        }
+
+        .video-description {
+            margin-top: 15px;
+            color: #3c4043;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1e88e5;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f3f4;
+            color: #3c4043;
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chat-section {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e4e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+
+        .chat-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .chat-tabs {
+            display: flex;
+            gap: 15px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: #5f6368;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #1e88e5;
+            border-bottom-color: #1e88e5;
+        }
+
+        .tab:hover {
+            color: #1e88e5;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #fafbfc;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .message-username {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e88e5;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #9aa0a6;
+        }
+
+        .message-content {
+            margin-left: 36px;
+            font-size: 14px;
+            color: #3c4043;
+            line-height: 1.5;
+        }
+
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #e0e4e9;
+            background: #fff;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #f1f3f4;
+            border: 1px solid #e0e4e9;
+            border-radius: 20px;
+            color: #3c4043;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #1e88e5;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+
+        .replay-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .replay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .replay-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .replay-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .replay-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e4e9;
+        }
+
+        .replay-item:hover {
+            background: #e8f4fd;
+            transform: translateX(5px);
+            border-color: #1e88e5;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+        }
+
+        .replay-thumbnail {
+            width: 120px;
+            height: 68px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .replay-duration {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .replay-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #1a1a1a;
+        }
+
+        .replay-info p {
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-section {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .video-title {
+                font-size: 16px;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                font-size: 12px;
+                padding: 8px 15px;
+            }
+
+            .controls-wrapper {
+                gap: 10px;
+            }
+
+            .control-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .control-btn.play-pause {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f3f4;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c5c9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9aa0a6;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">📚 LMS Platform</div>
+            <div class="user-info">
+                <span>Student Dashboard</span>
+                <div class="user-avatar">JD</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Video Section -->
+            <div>
+                <div class="video-section">
+                    <!-- Video Player -->
+                    <div class="video-container">
+                        <div class="live-badge">
+                            <span class="live-dot"></span>
+                            LIVE
+                        </div>
+
+                        <!-- YouTube Player -->
+                        <div id="player"></div>
+
+                        <!-- Blocker overlay for "More videos" section -->
+                        <div class="video-blocker"></div>
+
+                        <!-- Optional: Pause overlay -->
+                        <div class="pause-overlay" id="pauseOverlay"></div>
+
+                        <!-- Custom Video Controls -->
+                        <div class="custom-controls">
+                            <div class="controls-wrapper">
+                                <button class="control-btn skip-btn" id="skipBackward" title="Skip backward 10 seconds">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.10-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.05-.25-.05-.18.02-.25.05-.14.09-.19.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.02.25-.05.14-.09.19-.17.09-.19.11-.32.04-.29.04-.48v-.97z" />
+                                    </svg>
+                                </button>
+
+                                <button class="control-btn play-pause" id="playPauseBtn" title="Play/Pause">
+                                    <svg id="playIcon" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                    <svg id="pauseIcon" class="hidden" viewBox="0 0 24 24">
+                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                    </svg>
+                                </button>
+
+                                <button class="control-btn skip-btn" id="skipForward" title="Skip forward 10 seconds">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8zm-1.1 11h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.10-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.05-.25-.05-.18.02-.25.05-.14.09-.19.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.02.25-.05.14-.09.19-.17.09-.19.11-.32.04-.29.04-.48v-.97z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Info -->
+                    <div class="video-info">
+                        <h1 class="video-title">Advanced Flutter Development - Building Production Apps</h1>
+
+                        <div class="video-meta">
+                            <div class="viewer-count">
+                                <span>👁️</span>
+                                <span>1,234 watching now</span>
+                            </div>
+                            <span>•</span>
+                            <span>Started 25 minutes ago</span>
+                        </div>
+
+                        <div class="instructor-info">
+                            <div class="instructor-avatar"></div>
+                            <div class="instructor-details">
+                                <h3>Prof. Digital Spark</h3>
+                                <p>Senior Flutter Developer • 50K Students</p>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
+                                    viewBox="0 0 478.2 478.2">
+                                    <path
+                                        d="M457.575 325.1c9.8-12.5 14.5-25.9 13.9-39.7-.6-15.2-7.4-27.1-13-34.4 6.5-16.2 9-41.7-12.7-61.5-15.9-14.5-42.9-21-80.3-19.2-26.3 1.2-48.3 6.1-49.2 6.3h-.1c-5 .9-10.3 2-15.7 3.2-.4-6.4.7-22.3 12.5-58.1 14-42.6 13.2-75.2-2.6-97-16.6-22.9-43.1-24.7-50.9-24.7-7.5 0-14.4 3.1-19.3 8.8-11.1 12.9-9.8 36.7-8.4 47.7-13.2 35.4-50.2 122.2-81.5 146.3-.6.4-1.1.9-1.6 1.4-9.2 9.7-15.4 20.2-19.6 29.4-5.9-3.2-12.6-5-19.8-5h-61c-23 0-41.6 18.7-41.6 41.6v162.5c0 23 18.7 41.6 41.6 41.6h61c8.9 0 17.2-2.8 24-7.6l23.5 2.8c3.6.5 67.6 8.6 133.3 7.3 11.9.9 23.1 1.4 33.5 1.4 17.9 0 33.5-1.4 46.5-4.2 30.6-6.5 51.5-19.5 62.1-38.6 8.1-14.6 8.1-29.1 6.8-38.3 19.9-18 23.4-37.9 22.7-51.9-.4-8.1-2.2-15-4.1-20.1zm-409.3 122.2c-8.1 0-14.6-6.6-14.6-14.6V270.1c0-8.1 6.6-14.6 14.6-14.6h61c8.1 0 14.6 6.6 14.6 14.6v162.5c0 8.1-6.6 14.6-14.6 14.6h-61v.1zm383.7-133.9c-4.2 4.4-5 11.1-1.8 16.3 0 .1 4.1 7.1 4.6 16.7.7 13.1-5.6 24.7-18.8 34.6-4.7 3.6-6.6 9.8-4.6 15.4 0 .1 4.3 13.3-2.7 25.8-6.7 12-21.6 20.6-44.2 25.4-18.1 3.9-42.7 4.6-72.9 2.2h-1.4c-64.3 1.4-129.3-7-130-7.1h-.1l-10.1-1.2c.6-2.8.9-5.8.9-8.8V270.1c0-4.3-.7-8.5-1.9-12.4 1.8-6.7 6.8-21.6 18.6-34.3 44.9-35.6 88.8-155.7 90.7-160.9.8-2.1 1-4.4.6-6.7-1.7-11.2-1.1-24.9 1.3-29 5.3.1 19.6 1.6 28.2 13.5 10.2 14.1 9.8 39.3-1.2 72.7-16.8 50.9-18.2 77.7-4.9 89.5 6.6 5.9 15.4 6.2 21.8 3.9 6.1-1.4 11.9-2.6 17.4-3.5.4-.1.9-.2 1.3-.3 30.7-6.7 85.7-10.8 104.8 6.6 16.2 14.8 4.7 34.4 3.4 36.5-3.7 5.6-2.6 12.9 2.4 17.4.1.1 10.6 10 11.1 23.3.4 8.9-3.8 18-12.5 27z"
+                                        fill="#ffffff" />
+                                </svg>
+                                Like
+                            </button>
+                            <button class="btn btn-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512">
+                                    <path
+                                        d="M256 436a54.62 54.62 0 0 1-29.53-8.64c-25-16.07-73.08-49.05-113.75-89.32C62.81 288.58 37.5 242 37.5 199.56c0-29.49 8.72-56.51 25.22-78.13a115.2 115.2 0 0 1 137.89-35.75c21.18 9.14 40.07 24.55 55.39 45 15.32-20.5 34.21-35.91 55.39-45a115.2 115.2 0 0 1 137.89 35.75c16.5 21.62 25.22 48.64 25.22 78.13 0 42.44-25.31 89-75.22 138.44-40.67 40.27-88.73 73.25-113.75 89.32A54.62 54.62 0 0 1 256 436zM154.16 101.06a89.41 89.41 0 0 0-23.42 3.1 90.93 90.93 0 0 0-48.15 32.44c-13.14 17.22-20.09 39-20.09 63 0 35.52 22.81 76.12 67.81 120.68 39 38.66 85.47 70.5 109.67 86a29.72 29.72 0 0 0 32 0c24.2-15.54 70.63-47.38 109.67-86 45-44.56 67.81-85.16 67.81-120.68 0-24-6.95-45.74-20.09-63a90.93 90.93 0 0 0-48.15-32.44c-34.17-9.28-82.18.42-114.48 55.48a12.49 12.49 0 0 1-21.56 0c-25.38-43.34-60.54-58.58-91.02-58.58z" />
+                                </svg>
+                                Favorite
+                            </button>
+                        </div>
+
+                        <div class="video-description">
+                            <p><strong>📚 Course Description:</strong></p>
+                            <p>In this live session, we'll cover advanced Flutter concepts including state management
+                                with Provider, API integration, and deploying apps to production. Perfect for developers
+                                looking to take their Flutter skills to the next level.</p>
+                            <p><strong>🎯 Topics Covered:</strong></p>
+                            <p>• Advanced state management techniques<br>
+                                • RESTful API integration<br>
+                                • Error handling and validation<br>
+                                • App deployment strategies</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Replay Section -->
+                <div class="replay-section">
+                    <div class="replay-header">
+                        <h3>📼 Previous Sessions</h3>
+                        <button class="btn btn-secondary" style="padding: 6px 15px; font-size: 12px;">View All</button>
+                    </div>
+                    <div class="replay-list">
+                        <div class="replay-item">
+                            <div class="replay-thumbnail">
+                                <span class="replay-duration">1:45:30</span>
+                            </div>
+                            <div class="replay-info">
+                                <h4>Flutter State Management Basics</h4>
+                                <p>2 days ago • 2.5K views</p>
+                            </div>
+                        </div>
+                        <div class="replay-item">
+                            <div class="replay-thumbnail">
+                                <span class="replay-duration">2:10:15</span>
+                            </div>
+                            <div class="replay-info">
+                                <h4>Building Your First Flutter App</h4>
+                                <p>5 days ago • 3.2K views</p>
+                            </div>
+                        </div>
+                        <div class="replay-item">
+                            <div class="replay-thumbnail">
+                                <span class="replay-duration">1:30:45</span>
+                            </div>
+                            <div class="replay-info">
+                                <h4>Dart Programming Fundamentals</h4>
+                                <p>1 week ago • 4.1K views</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat/Comments Sidebar -->
+            <div class="sidebar">
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <h3>💬 Live Chat</h3>
+                        <div class="chat-tabs">
+                            <button class="tab active">Chat</button>
+                            <button class="tab">Q&A</button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages">
+                        <!-- Sample Messages -->
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">AS</div>
+                                <span class="message-username">Amit Singh</span>
+                                <span class="message-time">2 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                Great explanation! Can you cover Provider in more detail?
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">PR</div>
+                                <span class="message-username">Priya Roy</span>
+                                <span class="message-time">5 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                This is exactly what I needed! Thank you 🙏
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">RK</div>
+                                <span class="message-username">Rahul Kumar</span>
+                                <span class="message-time">7 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                How do we handle authentication with JWT tokens in Flutter?
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">SM</div>
+                                <span class="message-username">Sneha Mehta</span>
+                                <span class="message-time">10 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                Joined! Excited for this session 🚀
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">VJ</div>
+                                <span class="message-username">Vikram Joshi</span>
+                                <span class="message-time">12 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                Can you share the GitHub repository link?
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="message-avatar">AN</div>
+                                <span class="message-username">Anjali Nair</span>
+                                <span class="message-time">15 min ago</span>
+                            </div>
+                            <div class="message-content">
+                                Perfect timing! I was just working on this 💻
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" placeholder="Say something...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube IFrame API Script -->
+    <script>
+        // Load YouTube IFrame API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var playIcon = document.getElementById('playIcon');
+        var pauseIcon = document.getElementById('pauseIcon');
+
+        // API Ready Function
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: 'k8alX-Yedmc', // Replace with your video ID
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'fs': 1,
+                    'iv_load_policy': 3,
+                    'enablejsapi': 1,
+                    'origin': window.location.origin  // Add this line
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+
+            // Add referrer policy to iframe after creation
+            setTimeout(function () {
+                var iframe = document.querySelector('#player iframe');
+                if (iframe) {
+                    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                    iframe.setAttribute('title', 'YouTube video player');
+                    iframe.setAttribute('allow', 'accelerometer; autoplay;encrypted-media; gyroscope;');
+                }
+            }, 100);
+        }
+
+        // Player Ready
+        function onPlayerReady(event) {
+            console.log('Player is ready');
+            setTimeout(function () {
+                player.playVideo();
+            }, 1000);
+        }
+
+        // Player State Change
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        }
+
+        // Play/Pause Toggle
+        document.getElementById('playPauseBtn').addEventListener('click', function () {
+            if (player && player.getPlayerState) {
+                var state = player.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    player.pauseVideo();
+                } else {
+                    player.playVideo();
+                }
+            }
+        });
+
+        // Skip Backward 10 seconds
+        document.getElementById('skipBackward').addEventListener('click', function () {
+            if (player && player.getCurrentTime) {
+                var currentTime = player.getCurrentTime();
+                player.seekTo(Math.max(0, currentTime - 10), true);
+            }
+        });
+
+        // Skip Forward 10 seconds
+        document.getElementById('skipForward').addEventListener('click', function () {
+            if (player && player.getCurrentTime && player.getDuration) {
+                var currentTime = player.getCurrentTime();
+                var duration = player.getDuration();
+                player.seekTo(Math.min(duration, currentTime + 10), true);
+            }
+        });
+
+        // pause/play on click
+        document.querySelector('.pause-overlay').addEventListener('click', function () {
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        });
+
+        // Fullsceen on click
+        const container = document.querySelector('.video-container');
+        container.addEventListener('dblclick', function () {
+            if (!document.fullscreenElement) {
+                container.requestFullscreen();  // enter fullscreen
+            } else {
+                document.exitFullscreen();      // exit fullscreen
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (player && player.getPlayerState) {
+                if (e.code === 'Space' || e.code === 'KeyK') {
+                    e.preventDefault();
+                    var state = player.getPlayerState();
+                    if (state === YT.PlayerState.PLAYING) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
+                    }
+                }
+                else if (e.code === 'KeyJ') {
+                    e.preventDefault();
+                    var currentTime = player.getCurrentTime();
+                    player.seekTo(Math.max(0, currentTime - 10), true);
+                }
+                else if (e.code === 'KeyL') {
+                    e.preventDefault();
+                    var currentTime = player.getCurrentTime();
+                    var duration = player.getDuration();
+                    player.seekTo(Math.min(duration, currentTime + 10), true);
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
